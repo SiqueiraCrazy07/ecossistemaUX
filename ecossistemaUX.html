@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagrama do Ecossistema UXGroup / 4V</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & Babel CDNs para execução em arquivo único -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        .animate-zoom-in { animation: zoomIn 0.2s ease-out forwards; }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .tag-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            margin-right: 4px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Mocking Lucide icons because of CDN behavior
+        const Icon = ({ name, size = 20, className = "" }) => {
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            }, [name]);
+            return <i data-lucide={name} style={{ width: size, height: size }} className={className}></i>;
+        };
+
+        const App = () => {
+            const [selectedProduct, setSelectedProduct] = useState(null);
+            const [isLoaded, setIsLoaded] = useState(false);
+
+            useEffect(() => {
+                setIsLoaded(true);
+                if (window.lucide) window.lucide.createIcons();
+            }, []);
+
+            const productDetails = {
+                '4V': {
+                    title: "4V – Governança & Investimento",
+                    description: "Gestão estratégica e financeira do ecossistema.",
+                    features: [
+                        "Supervisão de compliance e auditoria financeira",
+                        "Direcionamento de expansão global",
+                        "Gestão de aportes e investimentos",
+                        "Governança corporativa unificada"
+                    ],
+                    color: "bg-slate-900",
+                    icon: "shield-check"
+                },
+                'UNBOX': {
+                    title: "UNBOX – Plataforma & Pay",
+                    description: "Origem da demanda e inteligência de checkout.",
+                    features: [
+                        "Plataforma de e-commerce White-label",
+                        "Gateway de pagamentos integrado",
+                        "Split de pagamentos complexo",
+                        "API Connect para ERPs"
+                    ],
+                    color: "bg-blue-600",
+                    icon: "credit-card"
+                },
+                'FUSION': {
+                    title: "FUSION – UX Solutions",
+                    description: "Motor de inteligência de fretes e integração.",
+                    features: [
+                        "Cálculo de frete multi-filiais",
+                        "Hub de integração (Notfis)",
+                        "Conciliação Financeira",
+                        "Regras de negócio dinâmicas"
+                    ],
+                    color: "bg-indigo-600",
+                    icon: "settings"
+                },
+                'TRUX': {
+                    title: "TRUX – TMS",
+                    description: "Gestão operacional e fiscal de transportes.",
+                    features: [
+                        "Emissão de CTe e MDFe",
+                        "Gestão de frota e custos",
+                        "Controle fiscal e auditoria",
+                        "Planejamento de rotas"
+                    ],
+                    color: "bg-orange-600",
+                    icon: "truck"
+                },
+                'ONDETAH': {
+                    title: "ONDETAH – Tracking",
+                    description: "Visibilidade e gestão de performance.",
+                    features: [
+                        "Rastreamento ponta a ponta",
+                        "Gestão de SLA de transportadoras",
+                        "Dashboards em tempo real",
+                        "Comunicação com o consumidor"
+                    ],
+                    color: "bg-emerald-600",
+                    icon: "bar-chart-3"
+                },
+                'WMX': {
+                    title: "WMX – WMS",
+                    description: "Gestão de armazém proprietária.",
+                    features: [
+                        "Gestão de estoque e inventário",
+                        "Otimização de Picking/Packing",
+                        "Controle de expedição",
+                        "Integração com UXLOG"
+                    ],
+                    color: "bg-blue-500",
+                    icon: "warehouse"
+                },
+                'UXLOG': {
+                    title: "UXLOG – Operação Logística",
+                    description: "Infraestrutura física de alta performance.",
+                    features: [
+                        "Fulfillment (Itajaí, Extrema, Barueri)",
+                        "Rede Logística (+350 PUDOs)",
+                        "First e Last Mile",
+                        "Forte presença no SE, MS e PR"
+                    ],
+                    color: "bg-slate-800",
+                    icon: "box"
+                },
+                'VNX': {
+                    title: "VNX – Transporte Feminino",
+                    description: "Operação logística com DNA de inclusão.",
+                    features: [
+                        "Transporte 100% operado por mulheres",
+                        "Foco em cuidado e segurança",
+                        "Via logística paralela",
+                        "Diferencial em experiência de entrega"
+                    ],
+                    color: "bg-pink-600",
+                    icon: "users"
+                },
+                'DATALAYER': {
+                    title: "Data Layer – Inteligência",
+                    description: "Base de inteligência preditiva do grupo.",
+                    features: [
+                        "Processamento de Big Data",
+                        "Perfis logísticos preditivos",
+                        "IA para otimização de frete",
+                        "Real-time analytics"
+                    ],
+                    color: "bg-indigo-700",
+                    icon: "database"
+                }
+            };
+
+            const DetailModal = () => {
+                if (!selectedProduct) return null;
+                const data = productDetails[selectedProduct];
+
+                return (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+                        <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-zoom-in">
+                            <div className={`${data.color} p-8 text-white relative`}>
+                                <button 
+                                    onClick={() => setSelectedProduct(null)}
+                                    className="absolute top-6 right-6 p-2 hover:bg-white/20 rounded-full transition-colors"
+                                >
+                                    <Icon name="x" size={20} />
+                                </button>
+                                <h3 className="text-2xl font-black uppercase tracking-tighter mb-2">{data.title}</h3>
+                                <p className="text-white/80 text-sm font-medium">{data.description}</p>
+                            </div>
+                            <div className="p-8">
+                                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Funcionalidades Detalhadas</h4>
+                                <ul className="space-y-4">
+                                    {data.features.map((feature, idx) => (
+                                        <li key={idx} className="flex gap-3 items-start">
+                                            <Icon name="check-circle-2" size={18} className="text-blue-600 mt-0.5 flex-shrink-0" />
+                                            <span className="text-sm text-slate-600 font-medium">{feature}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                                <button 
+                                    onClick={() => setSelectedProduct(null)}
+                                    className="w-full mt-10 py-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-widest rounded-xl transition-all"
+                                >
+                                    Fechar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            return (
+                <div className={`transition-opacity duration-700 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
+                    <div className="max-w-6xl mx-auto py-12 px-4">
+                        
+                        <header className="mb-16 text-center">
+                            <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest mb-4">
+                                <Icon name="zap" size={14} /> Arquitetura Interativa UXGroup
+                            </div>
+                            <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter">
+                                Ecossistema UXGroup <span className="text-blue-600">/</span> 4V
+                            </h1>
+                            <div className="h-1.5 w-24 bg-blue-600 mx-auto mt-6 rounded-full" />
+                        </header>
+
+                        <div className="space-y-12">
+                            {/* Camada 1: Governança */}
+                            <div className="flex justify-center">
+                                <button 
+                                    onClick={() => setSelectedProduct('4V')}
+                                    className="w-full max-w-lg bg-slate-900 text-white p-8 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all text-left group"
+                                >
+                                    <div className="flex items-center gap-4 mb-4">
+                                        <div className="p-3 rounded-xl bg-slate-800 text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                            <Icon name="shield-check" size={24} />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-sm uppercase tracking-wider leading-none">4V</h4>
+                                            <p className="text-[10px] opacity-60 font-medium uppercase tracking-tighter mt-1">Governança & Investimento</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-wrap mt-2">
+                                        <span className="tag-pill bg-slate-800 text-slate-400 group-hover:bg-blue-900 group-hover:text-blue-200 transition-colors">Compliance</span>
+                                        <span className="tag-pill bg-slate-800 text-slate-400 group-hover:bg-blue-900 group-hover:text-blue-200 transition-colors">Auditoria</span>
+                                        <span className="tag-pill bg-slate-800 text-slate-400 group-hover:bg-blue-900 group-hover:text-blue-200 transition-colors">Estratégia</span>
+                                    </div>
+                                </button>
+                            </div>
+
+                            {/* Camadas Centrais */}
+                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                                {/* Camada 2: UNBOX */}
+                                <div className="lg:col-span-2 flex flex-col justify-center">
+                                    <button 
+                                        onClick={() => setSelectedProduct('UNBOX')}
+                                        className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all text-left h-full flex flex-col group"
+                                    >
+                                        <div className="p-3 rounded-xl bg-blue-50 text-blue-600 mb-6 w-fit group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                            <Icon name="credit-card" size={24} />
+                                        </div>
+                                        <h4 className="font-bold text-sm uppercase tracking-wider mb-2">UNBOX</h4>
+                                        <div className="flex flex-col gap-1 mb-4 flex-1">
+                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">● Checkout White-label</span>
+                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">● Payment Gateway</span>
+                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">● Split de Pagamento</span>
+                                        </div>
+                                        <div className="flex items-center gap-1 text-blue-600 font-bold text-[9px]">
+                                            <Icon name="globe" size={12} /> EXPLORAR
+                                        </div>
+                                    </button>
+                                </div>
+
+                                {/* Camada 3: UX SOLUTIONS */}
+                                <div className="lg:col-span-4">
+                                    <div className="bg-slate-200/30 p-6 rounded-[2.5rem] border border-slate-200 border-dashed flex flex-col gap-4 h-full">
+                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">UX Solutions (Cérebro)</span>
+                                        
+                                        <button onClick={() => setSelectedProduct('FUSION')} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:border-blue-400 transition-all text-left group">
+                                            <div className="flex items-center gap-3 mb-2">
+                                                <Icon name="settings" size={18} className="text-indigo-600" />
+                                                <h5 className="font-bold text-xs uppercase">FUSION</h5>
+                                            </div>
+                                            <div className="flex flex-wrap">
+                                                <span className="text-[9px] font-bold text-slate-400 uppercase mr-2">Frete</span>
+                                                <span className="text-[9px] font-bold text-slate-400 uppercase mr-2">Hub</span>
+                                                <span className="text-[9px] font-bold text-slate-400 uppercase">Conciliação</span>
+                                            </div>
+                                        </button>
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <button onClick={() => setSelectedProduct('TRUX')} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:border-blue-400 transition-all text-left">
+                                                <Icon name="truck" size={18} className="text-orange-500 mb-2" />
+                                                <h5 className="font-bold text-[10px] uppercase">TRUX (TMS)</h5>
+                                                <span className="text-[8px] font-bold text-slate-400 uppercase">Fiscal & Frota</span>
+                                            </button>
+                                            <button onClick={() => setSelectedProduct('ONDETAH')} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:border-blue-400 transition-all text-left">
+                                                <Icon name="bar-chart-3" size={18} className="text-emerald-500 mb-2" />
+                                                <h5 className="font-bold text-[10px] uppercase">ONDETAH</h5>
+                                                <span className="text-[8px] font-bold text-slate-400 uppercase">SLA & Tracking</span>
+                                            </button>
+                                        </div>
+
+                                        <button onClick={() => setSelectedProduct('WMX')} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:border-blue-400 transition-all text-left">
+                                            <div className="flex items-center gap-3 mb-2">
+                                                <Icon name="warehouse" size={18} className="text-blue-500" />
+                                                <h5 className="font-bold text-xs uppercase">WMX (WMS)</h5>
+                                            </div>
+                                            <div className="flex flex-wrap">
+                                                <span className="text-[9px] font-bold text-slate-400 uppercase mr-2">Picking</span>
+                                                <span className="text-[9px] font-bold text-slate-400 uppercase mr-2">Packing</span>
+                                                <span className="text-[9px] font-bold text-slate-400 uppercase">Estoque</span>
+                                            </div>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Camada 4: OPERAÇÕES */}
+                                <div className="lg:col-span-6 flex flex-col gap-6">
+                                    <button onClick={() => setSelectedProduct('UXLOG')} className="flex-1 bg-slate-900 text-white p-8 rounded-3xl border border-slate-800 shadow-lg hover:shadow-2xl transition-all text-left group">
+                                        <div className="flex items-center gap-4 mb-6">
+                                            <div className="p-3 rounded-xl bg-slate-800 text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                                <Icon name="box" size={24} />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-sm uppercase tracking-wider">UXLOG</h4>
+                                                <p className="text-[10px] opacity-60 uppercase tracking-tighter">Fulfillment & Rede PUDO</p>
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-6">
+                                            <div className="border-l-2 border-slate-700 pl-4">
+                                                <h6 className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-2">CDs Próprios</h6>
+                                                <div className="flex flex-wrap gap-1">
+                                                    <span className="bg-slate-800 text-slate-400 text-[8px] px-1.5 py-0.5 rounded">Itajaí</span>
+                                                    <span className="bg-slate-800 text-slate-400 text-[8px] px-1.5 py-0.5 rounded">Extrema</span>
+                                                    <span className="bg-slate-800 text-slate-400 text-[8px] px-1.5 py-0.5 rounded">Barueri</span>
+                                                </div>
+                                            </div>
+                                            <div className="border-l-2 border-slate-700 pl-4">
+                                                <h6 className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-2">Rede Distribuída</h6>
+                                                <p className="text-[9px] text-slate-400">+350 pontos • PUDOs • NODOS</p>
+                                            </div>
+                                        </div>
+                                    </button>
+
+                                    <button onClick={() => setSelectedProduct('VNX')} className="bg-white border-2 border-pink-100 p-8 rounded-3xl shadow-sm hover:shadow-xl hover:border-pink-400 transition-all text-left group">
+                                        <div className="flex items-center gap-4 mb-4">
+                                            <div className="p-3 rounded-xl bg-pink-50 text-pink-600 group-hover:bg-pink-600 group-hover:text-white transition-colors">
+                                                <Icon name="users" size={24} />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-sm uppercase tracking-wider text-slate-900">VNX</h4>
+                                                <p className="text-[10px] text-pink-600 font-bold uppercase tracking-tighter">Transporte Feminino</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2">
+                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">● Last-Mile Especializado</span>
+                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">● Gestão 100% Mulheres</span>
+                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">● Excelência em Cuidado</span>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Camada 5: DATA LAYER */}
+                            <button 
+                                onClick={() => setSelectedProduct('DATALAYER')}
+                                className="w-full bg-white border border-slate-200 p-8 rounded-[2.5rem] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col md:flex-row items-center gap-8 text-left group"
+                            >
+                                <div className="bg-indigo-600 p-4 rounded-2xl text-white shadow-lg shadow-indigo-200 group-hover:bg-indigo-500 transition-colors">
+                                    <Icon name="database" size={32} />
+                                </div>
+                                <div className="flex-1">
+                                    <h4 className="font-bold text-sm uppercase tracking-widest text-slate-900 mb-2">Data Layer – Inteligência Unificada</h4>
+                                    <div className="flex flex-wrap gap-3">
+                                        <span className="text-[9px] font-bold text-indigo-600 uppercase bg-indigo-50 px-2 py-0.5 rounded">Processamento Big Data</span>
+                                        <span className="text-[9px] font-bold text-indigo-600 uppercase bg-indigo-50 px-2 py-0.5 rounded">Perfis Preditivos</span>
+                                        <span className="text-[9px] font-bold text-indigo-600 uppercase bg-indigo-50 px-2 py-0.5 rounded">Otimização de Frete</span>
+                                    </div>
+                                </div>
+                                <div className="bg-blue-50 text-blue-700 px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all">
+                                    Ver Inteligência
+                                </div>
+                            </button>
+                        </div>
+
+                        <footer className="mt-20 pt-10 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">
+                            <div className="flex gap-8">
+                                <span className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full bg-blue-600"></div> UXLOG</span>
+                                <span className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full bg-pink-500"></div> VNX</span>
+                                <span className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full bg-slate-900"></div> 4V</span>
+                            </div>
+                            <div className="text-center md:text-right">
+                                © 2024 UXGROUP CORPORATE ECOSYSTEM
+                                <p className="text-[8px] mt-1 opacity-50 tracking-normal font-normal">Sistemas de Gestão & Operação Integrada</p>
+                            </div>
+                        </footer>
+                    </div>
+                    <DetailModal />
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
