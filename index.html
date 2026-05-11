@@ -1,426 +1,677 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diagrama do Ecossistema UXGroup / 4V</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- React & Babel CDNs para execução em arquivo único -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ecossistema UXGroup / 4V - Fluxo Integrado</title>
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
 
-        @keyframes zoomIn {
-            from { transform: scale(0.95); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
-        .animate-zoom-in { animation: zoomIn 0.2s ease-out forwards; }
-
-        /* Custom scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        .tag-pill {
-            display: inline-flex;
-            align-items: center;
-            padding: 2px 8px;
-            border-radius: 9999px;
-            font-size: 9px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-            margin-right: 4px;
-            margin-bottom: 4px;
-        }
-    </style>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, system-ui, sans-serif; background: #f1f5f9; color: #0f172a; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes zoomIn { from { transform: scale(.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes flowLine { to { stroke-dashoffset: -30; } }
+    .animate-fade-in { animation: fadeIn .25s ease-out both; }
+    .animate-zoom-in { animation: zoomIn .18s ease-out both; }
+    .animate-flow-line { animation: flowLine 1.1s linear infinite; }
+    .scrollbar-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+    .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+    .glass-panel { background: rgba(255,255,255,.92); backdrop-filter: blur(12px); }
+    .zoom-slider-vertical { width: 132px; height: 18px; transform: rotate(-90deg); accent-color: #2563eb; }
+    .tag-pill { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 999px; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .025em; margin-right: 4px; margin-bottom: 4px; }
+  </style>
 </head>
 <body>
-    <div id="root"></div>
+  <div id="root"></div>
 
-    <script type="text/babel">
-        const { useState, useEffect } = React;
+  <script type="text/babel">
+    const { useEffect, useRef, useState } = React;
 
-        // Mocking Lucide icons because of CDN behavior
-        const Icon = ({ name, size = 20, className = "" }) => {
-            useEffect(() => {
-                if (window.lucide) {
-                    window.lucide.createIcons();
-                }
-            }, [name]);
-            return <i data-lucide={name} style={{ width: size, height: size }} className={className}></i>;
-        };
+    const Icon = ({ name, size = 20, className = "" }) => {
+      const ref = useRef(null);
+      useEffect(() => {
+        if (window.lucide) window.lucide.createIcons();
+      }, [name]);
+      return <i ref={ref} data-lucide={name} style={{ width: size, height: size }} className={className}></i>;
+    };
 
-        const App = () => {
-            const [selectedProduct, setSelectedProduct] = useState(null);
-            const [isLoaded, setIsLoaded] = useState(false);
+    const productDetails = {
+      "4V": {
+        title: "4V — Governança & Investimento",
+        subtitle: "Holding / direcionamento estratégico",
+        description: "Camada de governança corporativa, compliance, auditoria, estratégia e investimentos do ecossistema.",
+        color: "bg-slate-900",
+        icon: "shield-check",
+        tags: ["Governança", "Compliance", "Investimento", "Estratégia"],
+        features: [
+          "Define direção estratégica, expansão e priorização de investimentos.",
+          "Garante governança corporativa unificada entre produtos, tecnologia e operação.",
+          "Apoia auditoria, compliance e gestão financeira do ecossistema.",
+          "Conecta visão de negócio, escala operacional e sustentabilidade do grupo."
+        ]
+      },
+      "UNBOX": {
+        title: "UNBOX — Plataforma & Pay",
+        subtitle: "Origem da demanda e checkout",
+        description: "Camada comercial e transacional. Origina pedidos, processa checkout, pagamento, split e integra canais digitais.",
+        color: "bg-blue-600",
+        icon: "credit-card",
+        tags: ["Checkout", "White-label", "Gateway", "Split"],
+        features: [
+          "E-commerce white-label para canais próprios e parceiros.",
+          "Gateway de pagamento e split financeiro.",
+          "Conexão com ERPs, canais digitais e marketplaces.",
+          "Gera demanda transacional que alimenta Fusion, WMX, TRUX e tracking."
+        ]
+      },
+      "FUSION": {
+        title: "FUSION — OMS & Motor de Fretes",
+        subtitle: "Orquestração comercial, regras e integração",
+        description: "Camada cerebral de orquestração. Calcula frete, aplica regras, integra tabelas, conecta pedidos e dispara fluxos operacionais.",
+        color: "bg-indigo-600",
+        icon: "settings",
+        tags: ["Frete", "OMS", "Notfis", "Regras"],
+        features: [
+          "Cálculo de frete multi-filial e múltiplas transportadoras.",
+          "Hub de integração para pedidos, etiquetas, tabelas e NOTFIS.",
+          "Regras dinâmicas por origem, canal, produto, CEP, peso e SLA.",
+          "Conciliação e estrutura para operação comercial escalável."
+        ]
+      },
+      "WMX": {
+        title: "WMX — WMS",
+        subtitle: "Armazém, estoque, picking e expedição",
+        description: "Camada de gestão de armazém. Controla estoque, recebimento, picking, packing, inventário e expedição.",
+        color: "bg-sky-600",
+        icon: "warehouse",
+        tags: ["WMS", "Picking", "Packing", "Estoque"],
+        features: [
+          "Gestão de estoque, endereçamento e inventário.",
+          "Operação de picking, packing, conferência e expedição.",
+          "Base para fulfillment, estoque avançado e operações híbridas.",
+          "Integração com Fusion, TRUX, UXLOG e Data Layer."
+        ]
+      },
+      "TRUX": {
+        title: "TRUX — TMS",
+        subtitle: "Transporte, fiscal e execução",
+        description: "Camada de transporte. Emite documentos fiscais, organiza rotas, controla transportadoras, frota, custos e performance operacional.",
+        color: "bg-orange-600",
+        icon: "truck",
+        tags: ["TMS", "CTe", "MDFe", "Rotas"],
+        features: [
+          "Emissão e gestão de CTe, MDFe e documentos de transporte.",
+          "Controle de rotas, frota, custos e transportadoras.",
+          "Integração com NOTFIS e execução física de first/middle/last mile.",
+          "Base operacional para UXLOG, VNX e parceiros logísticos."
+        ]
+      },
+      "ONDETAH": {
+        title: "ONDETAH — Tracking & SLA",
+        subtitle: "Visibilidade, status e experiência",
+        description: "Camada de visibilidade. Centraliza tracking, eventos, ocorrências, SLA e comunicação com cliente final.",
+        color: "bg-emerald-600",
+        icon: "bar-chart-3",
+        tags: ["Tracking", "SLA", "Ocorrência", "Status"],
+        features: [
+          "Rastreamento ponta a ponta do pedido e da entrega.",
+          "Dashboards operacionais e gestão de SLA.",
+          "Registro e tratamento de ocorrências.",
+          "Comunicação com consumidor, seller, operação e cliente embarcador."
+        ]
+      },
+      "UXLOG": {
+        title: "UXLOG — Operação Logística",
+        subtitle: "Fulfillment, first mile, last mile e rede física",
+        description: "Camada física do ecossistema. Executa armazenagem, fulfillment, cross-docking, first mile, last mile, PUDOs e NODOS.",
+        color: "bg-slate-800",
+        icon: "box",
+        tags: ["Fulfillment", "First Mile", "Last Mile", "PUDOs"],
+        features: [
+          "Operações em CDs, hubs e pontos distribuídos.",
+          "Fulfillment, estoque avançado, cross-docking e expedição.",
+          "First mile, middle mile, last mile e logística reversa.",
+          "Rede distribuída com PUDOs, NODOS e presença regional estratégica."
+        ]
+      },
+      "VNX": {
+        title: "VNX — Transporte Feminino",
+        subtitle: "Last mile especializado com inclusão",
+        description: "Via operacional com foco em entrega, cuidado, segurança, inclusão e experiência diferenciada.",
+        color: "bg-pink-600",
+        icon: "users",
+        tags: ["Mulheres", "Cuidado", "Last Mile", "Experiência"],
+        features: [
+          "Operação logística com protagonismo feminino.",
+          "Foco em cuidado, segurança e experiência de entrega.",
+          "Malha paralela ou complementar à UXLOG.",
+          "Diferencial de marca para clientes com posicionamento ESG."
+        ]
+      },
+      "DATALAYER": {
+        title: "Data Layer — Inteligência Unificada",
+        subtitle: "Dados, IA, predição e performance",
+        description: "Camada de dados do grupo. Consolida eventos, pedidos, fretes, estoque, tracking, SLA e performance financeira.",
+        color: "bg-violet-700",
+        icon: "database",
+        tags: ["Big Data", "IA", "Analytics", "Performance"],
+        features: [
+          "Unificação dos dados transacionais, fiscais, logísticos e financeiros.",
+          "Análises preditivas para frete, estoque, ruptura, prazo e demanda.",
+          "Dashboards executivos e operacionais em tempo real.",
+          "Base para automações, IA e otimização contínua do ecossistema."
+        ]
+      }
+    };
 
-            useEffect(() => {
-                setIsLoaded(true);
-                if (window.lucide) window.lucide.createIcons();
-            }, []);
+    const products = [
+      { id: "UNBOX", name: "UNBOX", group: "Origem Comercial", icon: "credit-card", color: "blue", desc: "Checkout, plataforma e pagamento" },
+      { id: "FUSION", name: "FUSION", group: "Orquestração", icon: "settings", color: "indigo", desc: "OMS, frete, regras e integração" },
+      { id: "WMX", name: "WMX", group: "Armazém", icon: "warehouse", color: "sky", desc: "WMS, estoque e expedição" },
+      { id: "TRUX", name: "TRUX", group: "Transporte", icon: "truck", color: "orange", desc: "TMS, fiscal e rotas" },
+      { id: "ONDETAH", name: "ONDETAH", group: "Tracking", icon: "bar-chart-3", color: "emerald", desc: "SLA, status e ocorrência" },
+      { id: "UXLOG", name: "UXLOG", group: "Operação Física", icon: "box", color: "slate", desc: "Fulfillment, hubs, PUDOs e last mile" },
+      { id: "VNX", name: "VNX", group: "Operação Especializada", icon: "users", color: "pink", desc: "Transporte feminino e cuidado" },
+      { id: "DATALAYER", name: "DATA LAYER", group: "Inteligência", icon: "database", color: "violet", desc: "Dados, IA e analytics" },
+      { id: "4V", name: "4V", group: "Governança", icon: "shield-check", color: "slateDark", desc: "Compliance, investimento e estratégia" }
+    ];
 
-            const productDetails = {
-                '4V': {
-                    title: "4V – Governança & Investimento",
-                    description: "Gestão estratégica e financeira do ecossistema.",
-                    features: [
-                        "Supervisão de compliance e auditoria financeira",
-                        "Direcionamento de expansão global",
-                        "Gestão de aportes e investimentos",
-                        "Governança corporativa unificada"
-                    ],
-                    color: "bg-slate-900",
-                    icon: "shield-check"
-                },
-                'UNBOX': {
-                    title: "UNBOX – Plataforma & Pay",
-                    description: "Origem da demanda e inteligência de checkout.",
-                    features: [
-                        "Plataforma de e-commerce White-label",
-                        "Gateway de pagamentos integrado",
-                        "Split de pagamentos complexo",
-                        "API Connect para ERPs"
-                    ],
-                    color: "bg-blue-600",
-                    icon: "credit-card"
-                },
-                'FUSION': {
-                    title: "FUSION – UX Solutions",
-                    description: "Motor de inteligência de fretes e integração.",
-                    features: [
-                        "Cálculo de frete multi-filiais",
-                        "Hub de integração (Notfis)",
-                        "Conciliação Financeira",
-                        "Regras de negócio dinâmicas"
-                    ],
-                    color: "bg-indigo-600",
-                    icon: "settings"
-                },
-                'TRUX': {
-                    title: "TRUX – TMS",
-                    description: "Gestão operacional e fiscal de transportes.",
-                    features: [
-                        "Emissão de CTe e MDFe",
-                        "Gestão de frota e custos",
-                        "Controle fiscal e auditoria",
-                        "Planejamento de rotas"
-                    ],
-                    color: "bg-orange-600",
-                    icon: "truck"
-                },
-                'ONDETAH': {
-                    title: "ONDETAH – Tracking",
-                    description: "Visibilidade e gestão de performance.",
-                    features: [
-                        "Rastreamento ponta a ponta",
-                        "Gestão de SLA de transportadoras",
-                        "Dashboards em tempo real",
-                        "Comunicação com o consumidor"
-                    ],
-                    color: "bg-emerald-600",
-                    icon: "bar-chart-3"
-                },
-                'WMX': {
-                    title: "WMX – WMS",
-                    description: "Gestão de armazém proprietária.",
-                    features: [
-                        "Gestão de estoque e inventário",
-                        "Otimização de Picking/Packing",
-                        "Controle de expedição",
-                        "Integração com UXLOG"
-                    ],
-                    color: "bg-blue-500",
-                    icon: "warehouse"
-                },
-                'UXLOG': {
-                    title: "UXLOG – Operação Logística",
-                    description: "Infraestrutura física de alta performance.",
-                    features: [
-                        "Fulfillment (Itajaí, Extrema, Barueri)",
-                        "Rede Logística (+350 PUDOs)",
-                        "First e Last Mile",
-                        "Forte presença no SE, MS e PR"
-                    ],
-                    color: "bg-slate-800",
-                    icon: "box"
-                },
-                'VNX': {
-                    title: "VNX – Transporte Feminino",
-                    description: "Operação logística com DNA de inclusão.",
-                    features: [
-                        "Transporte 100% operado por mulheres",
-                        "Foco em cuidado e segurança",
-                        "Via logística paralela",
-                        "Diferencial em experiência de entrega"
-                    ],
-                    color: "bg-pink-600",
-                    icon: "users"
-                },
-                'DATALAYER': {
-                    title: "Data Layer – Inteligência",
-                    description: "Base de inteligência preditiva do grupo.",
-                    features: [
-                        "Processamento de Big Data",
-                        "Perfis logísticos preditivos",
-                        "IA para otimização de frete",
-                        "Real-time analytics"
-                    ],
-                    color: "bg-indigo-700",
-                    icon: "database"
-                }
-            };
+    const colorMap = {
+      blue: { bg: "bg-blue-50", border: "border-blue-200", text: "text-blue-700", dot: "bg-blue-600", solid: "bg-blue-600" },
+      indigo: { bg: "bg-indigo-50", border: "border-indigo-200", text: "text-indigo-700", dot: "bg-indigo-600", solid: "bg-indigo-600" },
+      sky: { bg: "bg-sky-50", border: "border-sky-200", text: "text-sky-700", dot: "bg-sky-600", solid: "bg-sky-600" },
+      orange: { bg: "bg-orange-50", border: "border-orange-200", text: "text-orange-700", dot: "bg-orange-600", solid: "bg-orange-600" },
+      emerald: { bg: "bg-emerald-50", border: "border-emerald-200", text: "text-emerald-700", dot: "bg-emerald-600", solid: "bg-emerald-600" },
+      slate: { bg: "bg-slate-50", border: "border-slate-200", text: "text-slate-700", dot: "bg-slate-700", solid: "bg-slate-800" },
+      slateDark: { bg: "bg-slate-900", border: "border-slate-800", text: "text-white", dot: "bg-slate-900", solid: "bg-slate-900" },
+      pink: { bg: "bg-pink-50", border: "border-pink-200", text: "text-pink-700", dot: "bg-pink-600", solid: "bg-pink-600" },
+      violet: { bg: "bg-violet-50", border: "border-violet-200", text: "text-violet-700", dot: "bg-violet-700", solid: "bg-violet-700" }
+    };
 
-            const DetailModal = () => {
-                if (!selectedProduct) return null;
-                const data = productDetails[selectedProduct];
+    const tabs = [
+      { id: "executive", label: "Fluxo Executivo", icon: "workflow" },
+      { id: "ecosystem", label: "Mapa do Ecossistema", icon: "network" },
+      { id: "technical", label: "Camada Técnica", icon: "layout-dashboard" }
+    ];
 
-                return (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-                        <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-zoom-in">
-                            <div className={`${data.color} p-8 text-white relative`}>
-                                <button 
-                                    onClick={() => setSelectedProduct(null)}
-                                    className="absolute top-6 right-6 p-2 hover:bg-white/20 rounded-full transition-colors"
-                                >
-                                    <Icon name="x" size={20} />
-                                </button>
-                                <h3 className="text-2xl font-black uppercase tracking-tighter mb-2">{data.title}</h3>
-                                <p className="text-white/80 text-sm font-medium">{data.description}</p>
-                            </div>
-                            <div className="p-8">
-                                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Funcionalidades Detalhadas</h4>
-                                <ul className="space-y-4">
-                                    {data.features.map((feature, idx) => (
-                                        <li key={idx} className="flex gap-3 items-start">
-                                            <Icon name="check-circle-2" size={18} className="text-blue-600 mt-0.5 flex-shrink-0" />
-                                            <span className="text-sm text-slate-600 font-medium">{feature}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                                <button 
-                                    onClick={() => setSelectedProduct(null)}
-                                    className="w-full mt-10 py-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-widest rounded-xl transition-all"
-                                >
-                                    Fechar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                );
-            };
+    function Header({ activeTab, setActiveTab }) {
+      return (
+        <header className="h-[74px] bg-white border-b border-slate-200 px-6 flex items-center justify-between shrink-0 z-30 shadow-sm">
+          <div className="flex items-center gap-5">
+            <div className="flex items-center gap-3 pr-5 border-r border-slate-200">
+              <div className="h-10 w-10 rounded-xl bg-slate-950 text-white flex items-center justify-center font-black">UX</div>
+              <div>
+                <strong className="text-slate-900 tracking-tight">UXGroup / 4V</strong>
+                <p className="text-xs text-slate-500 font-medium">Ecossistema integrado de tecnologia, dados e operação logística</p>
+              </div>
+            </div>
+            <span className="hidden lg:inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+              <Icon name="zap" size={13}/> Arquitetura Corporativa
+            </span>
+          </div>
 
-            return (
-                <div className={`transition-opacity duration-700 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
-                    <div className="max-w-6xl mx-auto py-12 px-4">
-                        
-                        <header className="mb-16 text-center">
-                            <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest mb-4">
-                                <Icon name="zap" size={14} /> Arquitetura Interativa UXGroup
-                            </div>
-                            <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter">
-                                Ecossistema UXGroup <span className="text-blue-600">/</span> 4V
-                            </h1>
-                            <div className="h-1.5 w-24 bg-blue-600 mx-auto mt-6 rounded-full" />
-                        </header>
+          <nav className="bg-slate-100 p-1 rounded-xl flex items-center gap-1 shadow-inner overflow-x-auto">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`h-10 px-4 rounded-lg text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
+                  activeTab === tab.id ? "bg-white text-blue-600 shadow-sm ring-1 ring-black/5" : "text-slate-500 hover:text-slate-800 hover:bg-white/60"
+                }`}
+              >
+                <Icon name={tab.icon} size={16}/>{tab.label}
+              </button>
+            ))}
+          </nav>
+        </header>
+      );
+    }
 
-                        <div className="space-y-12">
-                            {/* Camada 1: Governança */}
-                            <div className="flex justify-center">
-                                <button 
-                                    onClick={() => setSelectedProduct('4V')}
-                                    className="w-full max-w-lg bg-slate-900 text-white p-8 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all text-left group"
-                                >
-                                    <div className="flex items-center gap-4 mb-4">
-                                        <div className="p-3 rounded-xl bg-slate-800 text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                                            <Icon name="shield-check" size={24} />
-                                        </div>
-                                        <div>
-                                            <h4 className="font-bold text-sm uppercase tracking-wider leading-none">4V</h4>
-                                            <p className="text-[10px] opacity-60 font-medium uppercase tracking-tighter mt-1">Governança & Investimento</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex flex-wrap mt-2">
-                                        <span className="tag-pill bg-slate-800 text-slate-400 group-hover:bg-blue-900 group-hover:text-blue-200 transition-colors">Compliance</span>
-                                        <span className="tag-pill bg-slate-800 text-slate-400 group-hover:bg-blue-900 group-hover:text-blue-200 transition-colors">Auditoria</span>
-                                        <span className="tag-pill bg-slate-800 text-slate-400 group-hover:bg-blue-900 group-hover:text-blue-200 transition-colors">Estratégia</span>
-                                    </div>
-                                </button>
-                            </div>
-
-                            {/* Camadas Centrais */}
-                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-                                {/* Camada 2: UNBOX */}
-                                <div className="lg:col-span-2 flex flex-col justify-center">
-                                    <button 
-                                        onClick={() => setSelectedProduct('UNBOX')}
-                                        className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all text-left h-full flex flex-col group"
-                                    >
-                                        <div className="p-3 rounded-xl bg-blue-50 text-blue-600 mb-6 w-fit group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                                            <Icon name="credit-card" size={24} />
-                                        </div>
-                                        <h4 className="font-bold text-sm uppercase tracking-wider mb-2">UNBOX</h4>
-                                        <div className="flex flex-col gap-1 mb-4 flex-1">
-                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">● Checkout White-label</span>
-                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">● Payment Gateway</span>
-                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">● Split de Pagamento</span>
-                                        </div>
-                                        <div className="flex items-center gap-1 text-blue-600 font-bold text-[9px]">
-                                            <Icon name="globe" size={12} /> EXPLORAR
-                                        </div>
-                                    </button>
-                                </div>
-
-                                {/* Camada 3: UX SOLUTIONS */}
-                                <div className="lg:col-span-4">
-                                    <div className="bg-slate-200/30 p-6 rounded-[2.5rem] border border-slate-200 border-dashed flex flex-col gap-4 h-full">
-                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">UX Solutions (Cérebro)</span>
-                                        
-                                        <button onClick={() => setSelectedProduct('FUSION')} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:border-blue-400 transition-all text-left group">
-                                            <div className="flex items-center gap-3 mb-2">
-                                                <Icon name="settings" size={18} className="text-indigo-600" />
-                                                <h5 className="font-bold text-xs uppercase">FUSION</h5>
-                                            </div>
-                                            <div className="flex flex-wrap">
-                                                <span className="text-[9px] font-bold text-slate-400 uppercase mr-2">Frete</span>
-                                                <span className="text-[9px] font-bold text-slate-400 uppercase mr-2">Hub</span>
-                                                <span className="text-[9px] font-bold text-slate-400 uppercase">Conciliação</span>
-                                            </div>
-                                        </button>
-
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <button onClick={() => setSelectedProduct('TRUX')} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:border-blue-400 transition-all text-left">
-                                                <Icon name="truck" size={18} className="text-orange-500 mb-2" />
-                                                <h5 className="font-bold text-[10px] uppercase">TRUX (TMS)</h5>
-                                                <span className="text-[8px] font-bold text-slate-400 uppercase">Fiscal & Frota</span>
-                                            </button>
-                                            <button onClick={() => setSelectedProduct('ONDETAH')} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:border-blue-400 transition-all text-left">
-                                                <Icon name="bar-chart-3" size={18} className="text-emerald-500 mb-2" />
-                                                <h5 className="font-bold text-[10px] uppercase">ONDETAH</h5>
-                                                <span className="text-[8px] font-bold text-slate-400 uppercase">SLA & Tracking</span>
-                                            </button>
-                                        </div>
-
-                                        <button onClick={() => setSelectedProduct('WMX')} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:border-blue-400 transition-all text-left">
-                                            <div className="flex items-center gap-3 mb-2">
-                                                <Icon name="warehouse" size={18} className="text-blue-500" />
-                                                <h5 className="font-bold text-xs uppercase">WMX (WMS)</h5>
-                                            </div>
-                                            <div className="flex flex-wrap">
-                                                <span className="text-[9px] font-bold text-slate-400 uppercase mr-2">Picking</span>
-                                                <span className="text-[9px] font-bold text-slate-400 uppercase mr-2">Packing</span>
-                                                <span className="text-[9px] font-bold text-slate-400 uppercase">Estoque</span>
-                                            </div>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* Camada 4: OPERAÇÕES */}
-                                <div className="lg:col-span-6 flex flex-col gap-6">
-                                    <button onClick={() => setSelectedProduct('UXLOG')} className="flex-1 bg-slate-900 text-white p-8 rounded-3xl border border-slate-800 shadow-lg hover:shadow-2xl transition-all text-left group">
-                                        <div className="flex items-center gap-4 mb-6">
-                                            <div className="p-3 rounded-xl bg-slate-800 text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                                                <Icon name="box" size={24} />
-                                            </div>
-                                            <div>
-                                                <h4 className="font-bold text-sm uppercase tracking-wider">UXLOG</h4>
-                                                <p className="text-[10px] opacity-60 uppercase tracking-tighter">Fulfillment & Rede PUDO</p>
-                                            </div>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-6">
-                                            <div className="border-l-2 border-slate-700 pl-4">
-                                                <h6 className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-2">CDs Próprios</h6>
-                                                <div className="flex flex-wrap gap-1">
-                                                    <span className="bg-slate-800 text-slate-400 text-[8px] px-1.5 py-0.5 rounded">Itajaí</span>
-                                                    <span className="bg-slate-800 text-slate-400 text-[8px] px-1.5 py-0.5 rounded">Extrema</span>
-                                                    <span className="bg-slate-800 text-slate-400 text-[8px] px-1.5 py-0.5 rounded">Barueri</span>
-                                                </div>
-                                            </div>
-                                            <div className="border-l-2 border-slate-700 pl-4">
-                                                <h6 className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-2">Rede Distribuída</h6>
-                                                <p className="text-[9px] text-slate-400">+350 pontos • PUDOs • NODOS</p>
-                                            </div>
-                                        </div>
-                                    </button>
-
-                                    <button onClick={() => setSelectedProduct('VNX')} className="bg-white border-2 border-pink-100 p-8 rounded-3xl shadow-sm hover:shadow-xl hover:border-pink-400 transition-all text-left group">
-                                        <div className="flex items-center gap-4 mb-4">
-                                            <div className="p-3 rounded-xl bg-pink-50 text-pink-600 group-hover:bg-pink-600 group-hover:text-white transition-colors">
-                                                <Icon name="users" size={24} />
-                                            </div>
-                                            <div>
-                                                <h4 className="font-bold text-sm uppercase tracking-wider text-slate-900">VNX</h4>
-                                                <p className="text-[10px] text-pink-600 font-bold uppercase tracking-tighter">Transporte Feminino</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-wrap gap-2">
-                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">● Last-Mile Especializado</span>
-                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">● Gestão 100% Mulheres</span>
-                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">● Excelência em Cuidado</span>
-                                        </div>
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Camada 5: DATA LAYER */}
-                            <button 
-                                onClick={() => setSelectedProduct('DATALAYER')}
-                                className="w-full bg-white border border-slate-200 p-8 rounded-[2.5rem] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col md:flex-row items-center gap-8 text-left group"
-                            >
-                                <div className="bg-indigo-600 p-4 rounded-2xl text-white shadow-lg shadow-indigo-200 group-hover:bg-indigo-500 transition-colors">
-                                    <Icon name="database" size={32} />
-                                </div>
-                                <div className="flex-1">
-                                    <h4 className="font-bold text-sm uppercase tracking-widest text-slate-900 mb-2">Data Layer – Inteligência Unificada</h4>
-                                    <div className="flex flex-wrap gap-3">
-                                        <span className="text-[9px] font-bold text-indigo-600 uppercase bg-indigo-50 px-2 py-0.5 rounded">Processamento Big Data</span>
-                                        <span className="text-[9px] font-bold text-indigo-600 uppercase bg-indigo-50 px-2 py-0.5 rounded">Perfis Preditivos</span>
-                                        <span className="text-[9px] font-bold text-indigo-600 uppercase bg-indigo-50 px-2 py-0.5 rounded">Otimização de Frete</span>
-                                    </div>
-                                </div>
-                                <div className="bg-blue-50 text-blue-700 px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all">
-                                    Ver Inteligência
-                                </div>
-                            </button>
-                        </div>
-
-                        <footer className="mt-20 pt-10 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">
-                            <div className="flex gap-8">
-                                <span className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full bg-blue-600"></div> UXLOG</span>
-                                <span className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full bg-pink-500"></div> VNX</span>
-                                <span className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full bg-slate-900"></div> 4V</span>
-                            </div>
-                            <div className="text-center md:text-right">
-                                © 2024 UXGROUP CORPORATE ECOSYSTEM
-                                <p className="text-[8px] mt-1 opacity-50 tracking-normal font-normal">Sistemas de Gestão & Operação Integrada</p>
-                            </div>
-                        </footer>
-                    </div>
-                    <DetailModal />
+    function ProductModal({ selected, setSelected }) {
+      if (!selected) return null;
+      const data = productDetails[selected];
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden animate-zoom-in">
+            <div className={`${data.color} p-8 text-white relative`}>
+              <button onClick={() => setSelected(null)} className="absolute top-5 right-5 p-2 hover:bg-white/20 rounded-full transition-colors">
+                <Icon name="x" size={20}/>
+              </button>
+              <div className="flex items-start gap-4">
+                <div className="h-14 w-14 bg-white/15 rounded-2xl flex items-center justify-center">
+                  <Icon name={data.icon} size={30}/>
                 </div>
-            );
-        };
+                <div>
+                  <h3 className="text-2xl font-black uppercase tracking-tight mb-1">{data.title}</h3>
+                  <p className="text-white/80 text-sm font-medium">{data.subtitle}</p>
+                </div>
+              </div>
+            </div>
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
+            <div className="p-8">
+              <p className="text-sm text-slate-600 leading-relaxed mb-6">{data.description}</p>
+              <div className="mb-6">
+                {data.tags.map(tag => <span key={tag} className="tag-pill bg-slate-100 text-slate-600">{tag}</span>)}
+              </div>
+              <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Papel dentro do ecossistema</h4>
+              <ul className="space-y-3">
+                {data.features.map((feature, idx) => (
+                  <li key={idx} className="flex gap-3 items-start">
+                    <Icon name="check-circle-2" size={18} className="text-blue-600 mt-0.5 shrink-0"/>
+                    <span className="text-sm text-slate-700 leading-relaxed">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <button onClick={() => setSelected(null)} className="w-full mt-8 py-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-black uppercase tracking-widest rounded-xl transition-all">
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function MiniProduct({ id, onClick, compact = false }) {
+      const p = products.find(x => x.id === id);
+      const c = colorMap[p.color];
+      return (
+        <button onClick={() => onClick(id)} className={`group text-left rounded-2xl border ${c.border} ${c.bg} p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all w-full`}>
+          <div className="flex items-start gap-3">
+            <div className={`h-11 w-11 rounded-xl ${c.solid} text-white flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform`}>
+              <Icon name={p.icon} size={22}/>
+            </div>
+            <div className="min-w-0">
+              <h4 className={`font-black text-sm tracking-wide ${p.color === "slateDark" ? "text-white" : "text-slate-900"}`}>{p.name}</h4>
+              <p className={`${p.color === "slateDark" ? "text-slate-300" : "text-slate-500"} text-[11px] mt-1 font-bold uppercase`}>{p.group}</p>
+              {!compact && <p className={`${p.color === "slateDark" ? "text-slate-300" : "text-slate-600"} text-xs mt-2 leading-snug`}>{p.desc}</p>}
+            </div>
+          </div>
+        </button>
+      );
+    }
+
+    function ExecutiveFlow({ setSelected }) {
+      const lanes = [
+        {
+          title: "Origem da Demanda",
+          subtitle: "Comercial / Canais",
+          emoji: "🛒",
+          color: "blue",
+          footer: "Pedido e pagamento",
+          products: ["UNBOX"],
+          blocks: [
+            ["Checkout", "E-commerce, white-label, marketplace e pagamento."],
+            ["Pedido", "Transação nasce com dados comerciais e financeiros."]
+          ]
+        },
+        {
+          title: "Orquestração",
+          subtitle: "Regras / Frete / OMS",
+          emoji: "🧠",
+          color: "indigo",
+          footer: "Pedido roteado",
+          products: ["FUSION"],
+          blocks: [
+            ["Frete & regras", "Cálculo, tabela, elegibilidade, SLA e origem."],
+            ["Integração", "Conexão com WMX, TRUX, ERP e canais."]
+          ]
+        },
+        {
+          title: "Operação Física",
+          subtitle: "Armazém / Hubs / Rede",
+          emoji: "🏬",
+          color: "sky",
+          footer: "Separação e expedição",
+          products: ["WMX", "UXLOG"],
+          blocks: [
+            ["Estoque e WMS", "Recebimento, inventário, picking e packing."],
+            ["Fulfillment", "Hubs, CDs, PUDOs, NODOS e last mile."]
+          ]
+        },
+        {
+          title: "Transporte & Tracking",
+          subtitle: "TMS / SLA / Experiência",
+          emoji: "🚚",
+          color: "orange",
+          footer: "Entrega monitorada",
+          products: ["TRUX", "ONDETAH", "VNX"],
+          blocks: [
+            ["TMS e fiscal", "CTe, MDFe, roteirização e execução."],
+            ["Tracking", "Status, ocorrência, SLA e comunicação."]
+          ]
+        },
+        {
+          title: "Inteligência & Governança",
+          subtitle: "Dados / IA / 4V",
+          emoji: "📊",
+          color: "violet",
+          footer: "Gestão executiva",
+          products: ["DATALAYER", "4V"],
+          blocks: [
+            ["Data Layer", "Performance, predição, dashboards e automações."],
+            ["4V", "Governança, compliance, investimento e estratégia."]
+          ]
+        }
+      ];
+
+      const laneColor = {
+        blue: "bg-blue-50 border-blue-200 text-blue-900",
+        indigo: "bg-indigo-50 border-indigo-200 text-indigo-900",
+        sky: "bg-sky-50 border-sky-200 text-sky-900",
+        orange: "bg-orange-50 border-orange-200 text-orange-900",
+        violet: "bg-violet-50 border-violet-200 text-violet-900"
+      };
+      const dotColor = { blue: "bg-blue-600", indigo: "bg-indigo-600", sky: "bg-sky-600", orange: "bg-orange-600", violet: "bg-violet-700" };
+      const footerColor = {
+        blue: "bg-blue-100 text-blue-700",
+        indigo: "bg-indigo-100 text-indigo-700",
+        sky: "bg-sky-100 text-sky-700",
+        orange: "bg-orange-100 text-orange-700",
+        violet: "bg-violet-100 text-violet-700"
+      };
+      const arrowColors = ["#2563eb", "#4f46e5", "#0284c7", "#ea580c"];
+
+      return (
+        <main className="flex-1 overflow-auto scrollbar-thin bg-slate-100 p-8">
+          <section className="min-w-[1380px] max-w-[1540px] mx-auto bg-white rounded-[28px] border border-slate-200 shadow-xl p-8">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-black tracking-[0.22em] uppercase text-slate-800">Fluxo Executivo — Ecossistema UXGroup</h2>
+              <p className="text-sm text-slate-500 mt-2">
+                Do pedido à entrega: tecnologia comercial, orquestração, operação física, transporte, tracking, inteligência e governança.
+              </p>
+            </div>
+
+            <div className="relative grid grid-cols-5 gap-5">
+              <svg className="absolute inset-0 w-full h-[560px] pointer-events-none z-20" viewBox="0 0 1320 560" preserveAspectRatio="none">
+                <defs>
+                  <filter id="arrowShadow" x="-30%" y="-30%" width="160%" height="160%">
+                    <feDropShadow dx="0" dy="1" stdDeviation="1.2" floodColor="#0f172a" floodOpacity="0.18"/>
+                  </filter>
+                  <marker id="arrowHead" viewBox="0 0 16 16" refX="13" refY="8" markerWidth="9" markerHeight="9" orient="auto">
+                    <path d="M0 0 L16 8 L0 16 Z" fill="#2563eb"/>
+                  </marker>
+                </defs>
+                {[1,2,3,4].map(i => {
+                  const x1 = i * 264 - 18;
+                  const x2 = i * 264 + 22;
+                  const color = arrowColors[i - 1];
+                  return (
+                    <g key={i} filter="url(#arrowShadow)">
+                      <line x1={x1} y1="280" x2={x2} y2="280" stroke="#fff" strokeWidth="8" strokeLinecap="round"/>
+                      <line x1={x1} y1="280" x2={x2} y2="280" stroke={color} strokeWidth="4" strokeLinecap="round" markerEnd="url(#arrowHead)"/>
+                    </g>
+                  );
+                })}
+              </svg>
+
+              {lanes.map((lane, index) => (
+                <div key={lane.title} className={`relative z-10 rounded-2xl border ${laneColor[lane.color]} p-4 min-h-[560px] shadow-sm flex flex-col`}>
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className={`h-7 w-7 rounded-lg ${dotColor[lane.color]} text-white text-sm font-black flex items-center justify-center shadow-sm`}>{index + 1}</div>
+                    <div className="h-10 w-10 rounded-xl bg-white/80 flex items-center justify-center border border-white shadow-sm text-[22px]">{lane.emoji}</div>
+                    <div>
+                      <h3 className="font-black uppercase tracking-wide text-sm leading-tight">{lane.title}</h3>
+                      <p className="text-xs text-slate-500 mt-1">{lane.subtitle}</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    {lane.products.map(product => <MiniProduct key={product} id={product} onClick={setSelected} compact={lane.products.length > 1}/>)}
+                  </div>
+
+                  <div className="space-y-3 mt-4 flex-1">
+                    {lane.blocks.map(([title, body]) => (
+                      <div key={title} className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+                        <h4 className="font-black text-[12px] uppercase tracking-wide text-slate-800">{title}</h4>
+                        <p className="text-xs text-slate-500 mt-1 leading-snug">{body}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className={`mt-4 text-center rounded-xl ${footerColor[lane.color]} text-xs font-bold p-3`}>{lane.footer}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="relative mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4 shadow-sm">
+              <div className="grid grid-cols-4 gap-4">
+                {[
+                  ["🔁", "Ciclo fechado", "Pedido, operação, entrega e dados voltam para otimização."],
+                  ["🧩", "Produtos integrados", "Cada solução funciona sozinha, mas ganha força em ecossistema."],
+                  ["📡", "Visibilidade ponta a ponta", "Tracking, SLA, ocorrência e performance em tempo real."],
+                  ["📈", "Decisão executiva", "Data Layer e 4V transformam operação em inteligência de negócio."]
+                ].map(([emoji, title, desc]) => (
+                  <div key={title} className="bg-white rounded-2xl border border-slate-200 p-4 flex gap-3 items-center">
+                    <div className="h-11 w-11 rounded-xl bg-slate-100 flex items-center justify-center text-[22px]">{emoji}</div>
+                    <div>
+                      <h4 className="font-black text-xs uppercase text-slate-800">{title}</h4>
+                      <p className="text-xs text-slate-500 mt-1">{desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        </main>
+      );
+    }
+
+    function EcosystemMap({ setSelected }) {
+      return (
+        <main className="flex-1 overflow-auto scrollbar-thin bg-slate-50 p-8">
+          <section className="max-w-7xl mx-auto">
+            <header className="text-center mb-10">
+              <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4">
+                <Icon name="network" size={14}/> Arquitetura Interativa UXGroup
+              </div>
+              <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
+                Ecossistema UXGroup <span className="text-blue-600">/</span> 4V
+              </h1>
+              <p className="text-slate-500 mt-4 max-w-3xl mx-auto">
+                Mapa corporativo das camadas de negócio, tecnologia, operação física, transporte, tracking, dados e governança.
+              </p>
+              <div className="h-1.5 w-24 bg-blue-600 mx-auto mt-6 rounded-full"></div>
+            </header>
+
+            <div className="space-y-8">
+              <div className="flex justify-center">
+                <button onClick={() => setSelected("4V")} className="w-full max-w-2xl bg-slate-900 text-white p-7 rounded-3xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all text-left group">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 rounded-xl bg-slate-800 text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-colors"><Icon name="shield-check" size={26}/></div>
+                    <div>
+                      <h4 className="font-black text-lg uppercase tracking-wide">4V</h4>
+                      <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Governança, investimento, compliance e estratégia</p>
+                    </div>
+                  </div>
+                </button>
+              </div>
+
+              <div className="grid grid-cols-12 gap-7 items-stretch">
+                <div className="col-span-12 lg:col-span-2 flex">
+                  <div className="w-full flex flex-col justify-center">
+                    <MiniProduct id="UNBOX" onClick={setSelected}/>
+                  </div>
+                </div>
+
+                <div className="col-span-12 lg:col-span-4">
+                  <div className="bg-slate-100 p-6 rounded-[2rem] border border-slate-200 border-dashed h-full">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">UX Solutions — Camada de Orquestração</span>
+                    <div className="grid grid-cols-2 gap-4 mt-4">
+                      <div className="col-span-2"><MiniProduct id="FUSION" onClick={setSelected}/></div>
+                      <MiniProduct id="TRUX" onClick={setSelected} compact/>
+                      <MiniProduct id="ONDETAH" onClick={setSelected} compact/>
+                      <div className="col-span-2"><MiniProduct id="WMX" onClick={setSelected}/></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-span-12 lg:col-span-6 flex flex-col gap-6">
+                  <button onClick={() => setSelected("UXLOG")} className="flex-1 bg-slate-900 text-white p-8 rounded-3xl border border-slate-800 shadow-lg hover:shadow-2xl transition-all text-left group">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="p-3 rounded-xl bg-slate-800 text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-colors"><Icon name="box" size={26}/></div>
+                      <div>
+                        <h4 className="font-black text-lg uppercase tracking-wide">UXLOG</h4>
+                        <p className="text-xs opacity-60 uppercase tracking-widest">Fulfillment, rede física, first mile, last mile e PUDOs</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-6">
+                      <div className="border-l-2 border-slate-700 pl-4">
+                        <h6 className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">CDs / Hubs / Operação</h6>
+                        <p className="text-xs text-slate-400">Fulfillment, estoque avançado, cross-docking, hubs e expedição.</p>
+                      </div>
+                      <div className="border-l-2 border-slate-700 pl-4">
+                        <h6 className="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-2">Rede Distribuída</h6>
+                        <p className="text-xs text-slate-400">PUDOs, NODOS, first mile, last mile e logística reversa.</p>
+                      </div>
+                    </div>
+                  </button>
+                  <MiniProduct id="VNX" onClick={setSelected}/>
+                </div>
+              </div>
+
+              <button onClick={() => setSelected("DATALAYER")} className="w-full bg-white border border-slate-200 p-8 rounded-[2rem] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col md:flex-row items-center gap-8 text-left group">
+                <div className="bg-violet-700 p-4 rounded-2xl text-white shadow-lg shadow-violet-200 group-hover:bg-violet-600 transition-colors">
+                  <Icon name="database" size={34}/>
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-black text-lg uppercase tracking-widest text-slate-900 mb-2">Data Layer — Inteligência Unificada</h4>
+                  <p className="text-sm text-slate-500 max-w-4xl">Camada que consolida dados de pedido, frete, estoque, transporte, tracking, SLA e performance para gerar visão preditiva e decisão executiva.</p>
+                </div>
+                <div className="bg-blue-50 text-blue-700 px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest group-hover:bg-blue-600 group-hover:text-white transition-all">
+                  Ver inteligência
+                </div>
+              </button>
+            </div>
+          </section>
+        </main>
+      );
+    }
+
+    function TechnicalLayer({ setSelected }) {
+      const nodes = {
+        unbox: { x: 120, y: 190, id: "UNBOX", label: "Canais / UNBOX", icon: "credit-card", color: "#2563eb" },
+        fusion: { x: 360, y: 190, id: "FUSION", label: "FUSION", icon: "settings", color: "#4f46e5" },
+        wmx: { x: 610, y: 95, id: "WMX", label: "WMX", icon: "warehouse", color: "#0284c7" },
+        trux: { x: 610, y: 285, id: "TRUX", label: "TRUX", icon: "truck", color: "#ea580c" },
+        uxlog: { x: 860, y: 145, id: "UXLOG", label: "UXLOG", icon: "box", color: "#0f172a" },
+        vnx: { x: 860, y: 335, id: "VNX", label: "VNX", icon: "users", color: "#db2777" },
+        ondetah: { x: 1110, y: 190, id: "ONDETAH", label: "ONDETAH", icon: "bar-chart-3", color: "#059669" },
+        data: { x: 650, y: 500, id: "DATALAYER", label: "DATA LAYER", icon: "database", color: "#6d28d9" },
+        gov: { x: 1110, y: 500, id: "4V", label: "4V", icon: "shield-check", color: "#111827" }
+      };
+
+      const links = [
+        ["unbox", "fusion", "Pedido / checkout"],
+        ["fusion", "wmx", "Ordem / estoque"],
+        ["fusion", "trux", "Frete / NOTFIS"],
+        ["wmx", "uxlog", "Picking / expedição"],
+        ["trux", "uxlog", "Transporte / rota"],
+        ["trux", "vnx", "Operação dedicada"],
+        ["uxlog", "ondetah", "Eventos logísticos"],
+        ["vnx", "ondetah", "Tracking especializado"],
+        ["ondetah", "data", "Status / SLA"],
+        ["wmx", "data", "Inventário"],
+        ["fusion", "data", "Pedido / frete"],
+        ["data", "gov", "Indicadores executivos"]
+      ];
+
+      const pathFor = (a, b) => {
+        const s = nodes[a], e = nodes[b];
+        const x1 = s.x + 80, x2 = e.x - 80;
+        const y1 = s.y, y2 = e.y;
+        const midX = (x1 + x2) / 2;
+        if (Math.abs(x1 - x2) < 130) {
+          const yStart = s.y + 54;
+          const yEnd = e.y - 54;
+          const midY = (yStart + yEnd) / 2;
+          return `M ${s.x} ${yStart} C ${s.x} ${midY}, ${e.x} ${midY}, ${e.x} ${yEnd}`;
+        }
+        return `M ${x1} ${y1} C ${midX} ${y1}, ${midX} ${y2}, ${x2} ${y2}`;
+      };
+
+      return (
+        <main className="flex-1 overflow-auto scrollbar-thin bg-slate-100 p-8">
+          <section className="min-w-[1280px] max-w-[1400px] mx-auto bg-white rounded-[28px] border border-slate-200 shadow-xl p-8">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-black tracking-[0.22em] uppercase text-slate-800">Camada Técnica — Fluxo de Dados e Execução</h2>
+              <p className="text-sm text-slate-500 mt-2">Relação sistêmica entre origem, orquestração, armazém, transporte, operação física, tracking, dados e governança.</p>
+            </div>
+
+            <div className="relative h-[620px] rounded-3xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white overflow-hidden">
+              <div className="absolute left-6 top-6 text-slate-200 font-black text-5xl uppercase tracking-widest">Tecnologia</div>
+              <div className="absolute right-6 top-6 text-slate-200 font-black text-5xl uppercase tracking-widest">Operação</div>
+              <div className="absolute left-6 bottom-6 text-violet-100 font-black text-5xl uppercase tracking-widest">Dados & Governança</div>
+
+              <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 1280 620">
+                <defs>
+                  <marker id="techArrow" viewBox="0 0 14 14" refX="12" refY="7" markerWidth="9" markerHeight="9" orient="auto">
+                    <path d="M0 0 L14 7 L0 14 Z" fill="#64748b"/>
+                  </marker>
+                </defs>
+                {links.map(([a,b,label], idx) => {
+                  const path = pathFor(a,b);
+                  return (
+                    <g key={idx}>
+                      <path d={path} fill="none" stroke="#fff" strokeWidth="8" strokeLinecap="round"/>
+                      <path d={path} fill="none" stroke="#94a3b8" strokeWidth="3" strokeLinecap="round" markerEnd="url(#techArrow)"/>
+                      <path d={path} fill="none" stroke="#2563eb" strokeWidth="2" strokeDasharray="7 7" className="animate-flow-line" opacity="0.35"/>
+                    </g>
+                  );
+                })}
+              </svg>
+
+              {Object.entries(nodes).map(([key, node]) => (
+                <button
+                  key={key}
+                  onClick={() => setSelected(node.id)}
+                  className="absolute -translate-x-1/2 -translate-y-1/2 w-[170px] min-h-[108px] bg-white rounded-2xl border border-slate-200 shadow-lg p-4 text-left hover:shadow-xl hover:scale-[1.03] transition-all z-10"
+                  style={{ left: node.x, top: node.y }}
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="h-10 w-10 rounded-xl flex items-center justify-center text-white shrink-0" style={{ background: node.color }}>
+                      <Icon name={node.icon} size={21}/>
+                    </div>
+                    <h4 className="font-black text-xs text-slate-800 uppercase leading-tight">{node.label}</h4>
+                  </div>
+                  <p className="text-[11px] text-slate-500 leading-snug">{productDetails[node.id]?.subtitle}</p>
+                </button>
+              ))}
+            </div>
+          </section>
+        </main>
+      );
+    }
+
+    function App() {
+      const [activeTab, setActiveTab] = useState("executive");
+      const [selected, setSelected] = useState(null);
+
+      useEffect(() => {
+        if (window.lucide) window.lucide.createIcons();
+      }, [activeTab, selected]);
+
+      return (
+        <div className="h-screen w-screen flex flex-col bg-slate-100 overflow-hidden">
+          <Header activeTab={activeTab} setActiveTab={setActiveTab}/>
+          <div className="flex flex-1 min-h-0">
+            {activeTab === "executive" && <ExecutiveFlow setSelected={setSelected}/>}
+            {activeTab === "ecosystem" && <EcosystemMap setSelected={setSelected}/>}
+            {activeTab === "technical" && <TechnicalLayer setSelected={setSelected}/>}
+          </div>
+          <ProductModal selected={selected} setSelected={setSelected}/>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+  </script>
 </body>
 </html>
